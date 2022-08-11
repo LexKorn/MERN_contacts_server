@@ -1,14 +1,11 @@
 const {Router} = require('express');
 const Contacts = require('../models/Contacts');
-// const auth = require('../middleware/auth.middleware');
+const auth = require('../middleware/auth.middleware');
 
 const router = Router();
 
 
-// во все endpoints добавить auth
-
-
-router.post('/post', async (req, res) => {
+router.post('/post', auth, async (req, res) => {
     try {
         const {name, phone} = req.body;
         const contact = new Contacts({name, phone});
@@ -20,7 +17,7 @@ router.post('/post', async (req, res) => {
     }
 });
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
         const contacts = await Contacts.find(req.params);
         res.json(contacts);
@@ -30,7 +27,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.delete('/post-delete/:id', async (req, res) => {
+router.delete('/post-delete/:id', auth, async (req, res) => {
     try {
         await Contacts.findOne({ _id: req.params.id }).exec((err, result) => {
             if (err) {
@@ -48,7 +45,7 @@ router.delete('/post-delete/:id', async (req, res) => {
     }
 });
 
-router.put('/post-update', async (req, res) => {
+router.put('/post-update', auth, async (req, res) => {
     try {
         await Contacts.findByIdAndUpdate(
             { _id: req.body.contactId },
