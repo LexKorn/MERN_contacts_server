@@ -1,17 +1,14 @@
 const {Router} = require('express');
 const Contacts = require('../models/Contacts');
-// const auth = require('../middleware/auth.middleware');
+const auth = require('../middleware/auth.middleware');
 
 const router = Router();
 
 
-// во все endpoints добавить auth
-
-
-router.post('/post', async (req, res) => {
+router.post('/post', auth, async (req, res) => {
     try {
         const {name, phone} = req.body;
-        const contact = new Contacts({name, phone});
+        const contact = new Contacts({name, phone, owner: req.user.userId});
         await contact.save();
         res.status(201).json({message: 'Контакт добавлен'});
 
@@ -20,9 +17,9 @@ router.post('/post', async (req, res) => {
     }
 });
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
-        const contacts = await Contacts.find(req.params);
+        const contacts = await Contacts.find({ owner: req.user.userId });
         res.json(contacts);
 
     } catch(err) {
@@ -30,7 +27,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.delete('/post-delete/:id', async (req, res) => {
+router.delete('/post-delete/:id', auth, async (req, res) => {
     try {
         await Contacts.findOne({ _id: req.params.id }).exec((err, result) => {
             if (err) {
@@ -48,7 +45,7 @@ router.delete('/post-delete/:id', async (req, res) => {
     }
 });
 
-router.put('/post-update', async (req, res) => {
+router.put('/post-update', auth, async (req, res) => {
     try {
         await Contacts.findByIdAndUpdate(
             { _id: req.body.contactId },
@@ -70,7 +67,7 @@ router.put('/post-update', async (req, res) => {
     }
 });
 
-router.get('/post/:id', async (req, res) => {
+router.get('/post/:id', auth, async (req, res) => {
 	const post = await Contacts.findOne({ _id: req.params.id });
 
 	if (!post) {
