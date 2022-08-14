@@ -67,5 +67,15 @@ router.put('/post-update', auth, async (req, res) => {
     }
 });
 
+router.get('/post/:id', auth, async (req, res) => {
+	const post = await Contacts.findOne({ _id: req.params.id });
+
+	if (!post) {
+		return res.status(422).json({ message: 'Нет такого контакта' });
+	}
+
+	res.status(200).json(post);
+});
+
 
 module.exports = router;
