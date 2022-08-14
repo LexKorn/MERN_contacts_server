@@ -8,7 +8,7 @@ const router = Router();
 router.post('/post', auth, async (req, res) => {
     try {
         const {name, phone} = req.body;
-        const contact = new Contacts({name, phone});
+        const contact = new Contacts({name, phone, owner: req.user.userId});
         await contact.save();
         res.status(201).json({message: 'Контакт добавлен'});
 
@@ -19,7 +19,7 @@ router.post('/post', auth, async (req, res) => {
 
 router.get('/', auth, async (req, res) => {
     try {
-        const contacts = await Contacts.find(req.params);
+        const contacts = await Contacts.find({ owner: req.user.userId });
         res.json(contacts);
 
     } catch(err) {
